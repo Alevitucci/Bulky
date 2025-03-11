@@ -5,7 +5,7 @@ using BulkyWeb.DataAccess.Data;
 using BulkyWeb.DataAccess.Data;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BulkyWeb.Controllers
+namespace BulkyWeb.Areas.Admin.Controllers
 {
     public class CategoryController : Controller
     {
