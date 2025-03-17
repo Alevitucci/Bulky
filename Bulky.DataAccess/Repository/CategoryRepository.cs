@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BulkyWeb.DataAccess.Data;
-using Bulky.Models;
+
 
 namespace Bulky.DataAccess.Repository.IRepository
 {

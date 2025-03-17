@@ -14,15 +14,16 @@ namespace Bulky.Models
     public class Product
     {
         [Key]
-
+        [Required]
         public int Id { get; set;  }
         [Required]
-        public String Title { get; set; }
-        public String Description { get; set; }
+        public string? Title { get; set; }
         [Required]
-        public String ISBN { get; set; }
+        public string? Description { get; set; }
         [Required]
-        public String Author { get; set; }
+        public string? ISBN { get; set; }
+        [Required]
+        public string? Author { get; set; }
         [Required]
         [Display(Name = "List Price")]
         [Range(1, 1000)]
@@ -43,10 +44,13 @@ namespace Bulky.Models
         [Range(1, 1000)]
         public double Price100 { get; set; }
 
+        [Required]
         public int CategoryId { get; set; }
         [ForeignKey("CategoryId")]
         [ValidateNever]
-        public Category Category { get; set; }
-        public string? imageUrl { get; set; }
+
+        [Required]
+        public Category? Category { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

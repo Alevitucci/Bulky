@@ -13,7 +13,12 @@ namespace Bulky.DataAccess.Repository
             _db = db;
         }
 
-        public void Update(Product obj)     
+        public void Save()
+        {
+            _db.SaveChanges();
+        }
+
+        public void Update(Product obj)
         {
             var objFromDb = _db.Products.FirstOrDefault(u => u.Id == obj.Id);
             if(objFromDb != null)
@@ -28,9 +33,9 @@ namespace Bulky.DataAccess.Repository
                 objFromDb.CategoryId = obj.CategoryId;
                 objFromDb.Author = obj.Author;
                 
-                if(obj.imageUrl != null)
+                if(obj.ImageUrl != null)
                 {
-                    objFromDb.imageUrl = obj.imageUrl;
+                    objFromDb.ImageUrl = obj.ImageUrl;
                 }
             }
             
