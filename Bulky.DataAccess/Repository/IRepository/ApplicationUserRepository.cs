@@ -45,9 +45,6 @@ namespace Bulky.DataAccess.Repository.IRepository
             throw new NotImplementedException();
         }
 
-        IEnumerable<ApplicationUser> IRepository<ApplicationUser>.GetAll(string? includeProperties)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }
