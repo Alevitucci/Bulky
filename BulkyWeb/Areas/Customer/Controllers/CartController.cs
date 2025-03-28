@@ -24,6 +24,7 @@ namespace BulkyWeb.Areas.Customer.Controllers
         public CartController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
+       
         }
         public IActionResult Index()
         {
@@ -36,7 +37,7 @@ namespace BulkyWeb.Areas.Customer.Controllers
                 OrderHeader = new()
             };
 
-            foreach(var cart in ShoppingCartVM.ShoppingCartList)
+            foreach (var cart in ShoppingCartVM.ShoppingCartList)
             {
                 cart.Price = GetPriceBasedOnQuantity(cart);
                 ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
@@ -85,9 +86,7 @@ namespace BulkyWeb.Areas.Customer.Controllers
             ShoppingCartVM.OrderHeader.ApplicationUserId = userId;
             ShoppingCartVM.OrderHeader.OrderDate = System.DateTime.Now;
 
-
             ApplicationUser applicationUser = _unitOfWork.ApplicationUser.Get(u => u.Id == userId);
-
 
             foreach (var cart in ShoppingCartVM.ShoppingCartList)
             {
@@ -97,13 +96,13 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
             if (applicationUser.CompanyId.GetValueOrDefault() == 0)
             {
-                //account customer regolare , abbiamo bisogno di catturare il pagamento
+                // account customer regolare, abbiamo bisogno di catturare il pagamento
                 ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
                 ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
             }
             else
             {
-                //account company , non abbiamo bisogno di catturare il pagamento
+                // account company, non abbiamo bisogno di catturare il pagamento
                 ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusApproved;
                 ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusApproved;
             }
@@ -122,6 +121,7 @@ namespace BulkyWeb.Areas.Customer.Controllers
                 _unitOfWork.OrderDetail.Add(orderDetail);
                 _unitOfWork.Save();
             }
+
             if (applicationUser.CompanyId.GetValueOrDefault() == 0)
             {
                 var domain = "https://localhost:7099/";
@@ -133,11 +133,10 @@ namespace BulkyWeb.Areas.Customer.Controllers
                     LineItems = new List<SessionLineItemOptions>(),
                     Mode = "payment",
                 };
+
                 foreach (var item in ShoppingCartVM.ShoppingCartList)
                 {
-
                     var sessionLineItem = new SessionLineItemOptions
-
                     {
                         PriceData = new SessionLineItemPriceDataOptions
                         {
@@ -149,8 +148,15 @@ namespace BulkyWeb.Areas.Customer.Controllers
                             }
                         },
                         Quantity = item.Count
-                    }
-                ; options.LineItems.Add(sessionLineItem);
+                    };
+                    options.LineItems.Add(sessionLineItem);
+                }
+
+                if (options.LineItems.Count == 0)
+                {
+                    // Gestisci il caso in cui non ci sono elementi nel carrello
+                    ModelState.AddModelError("", "Il carrello è vuoto. Aggiungi degli articoli prima di procedere.");
+                    return View(ShoppingCartVM);
                 }
 
                 var service = new SessionService();
@@ -166,7 +172,7 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
         public IActionResult OrderConfirmation(int id)
         {
-            OrderHeader orderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == id);
+            OrderHeader orderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == id, includeProperties:"ApplicationUser");
             if (orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment)
             {
 
@@ -176,9 +182,10 @@ namespace BulkyWeb.Areas.Customer.Controllers
                 if (session.PaymentStatus.ToLower() == "paid")
                 {
                     _unitOfWork.OrderHeader.UpdateStripePaymentID(id, session.Id, session.PaymentIntentId);
-                    _unitOfWork.OrderHeader.UpdateStatus(id, SD.StatusApproved,SD.PaymentStatusApproved);
+                    _unitOfWork.OrderHeader.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
                     _unitOfWork.Save();
                 }
+                HttpContext.Session.Clear();
             }
             List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
             _unitOfWork.ShoppingCart.RemoveRange(shoppingCarts);
@@ -198,9 +205,10 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
         public IActionResult Minus(int cartId)
         {
-            var cartFromDb = _unitOfWork.ShoppingCart.Get(c => c.Id == cartId);
+            var cartFromDb = _unitOfWork.ShoppingCart.Get(u => u.Id == cartId,tracked:true );
             if (cartFromDb.Count <= 1)
             {
+                HttpContext.Session.SetInt32(SD.SessionCart, _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == cartFromDb.ApplicationUserId).Count() - 1);
                 _unitOfWork.ShoppingCart.Remove(cartFromDb);
             }
             else
@@ -210,21 +218,23 @@ namespace BulkyWeb.Areas.Customer.Controllers
             }
 
             _unitOfWork.Save();
+           
             return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Remove(int cartId)
         {
-            var cartFromDb = _unitOfWork.ShoppingCart.Get(c => c.Id == cartId);
-            
-              _unitOfWork.ShoppingCart.Remove(cartFromDb);
+            var cartFromDb = _unitOfWork.ShoppingCart.Get(c => c.Id == cartId, tracked: true);
+
+            HttpContext.Session.SetInt32(SD.SessionCart, _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == cartFromDb.ApplicationUserId).Count() - 1);
+            _unitOfWork.ShoppingCart.Remove(cartFromDb);
             _unitOfWork.Save();
             return RedirectToAction(nameof(Index));
         }
 
         private double GetPriceBasedOnQuantity(ShoppingCart shoppingCart)
         {
-            if(shoppingCart.Count<=50)
+            if (shoppingCart.Count <= 50)
             {
                 return shoppingCart.Product.Price;
             }
