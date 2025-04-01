@@ -1,0 +1,67 @@
+﻿@using Bulky.Utility
+@using Bulky.Models
+
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form method="post">
+	<div class="border p-3 mt-4">
+		<div class="row pb-2">
+			<h2 class="text-primary">Manage User Role</h2>
+			<hr />
+		</div>
+		121		<input asp-for="ApplicationUser.Id" hidden />
+		<div asp-validation-summary="All"></div>
+		<div class="mb-3 row p-1">
+			<label asp-for="ApplicationUser.Name" class="p-0"></label>
+			<input asp-for="ApplicationUser.Name" class="form-control" />
+			<span asp-validation-for="Name" class="text-danger"></span>
+		</div>
+		<div class="mb-3 row p-1">
+			<select asp-for="ApplicationUser.Role" asp-items="@Model.RoleList" class="form-select"></select>
+		</div>
+		@{
+			var companyVisible = "display:none;";
+		}
+		@if (Model.CurrentRole == SD.Role_Company)
+		{
+			companyVisible = "display:block;";
+		}
+		<div class="mb-3 row p-1">
+			<select asp-for="ApplicationUser.CompanyId" style="@companyVisible" asp-items="@Model.CompanyList" class="form-select"></select>
+		</div>
+		<div class="row">
+			<div class="col-6 col-md-3">
+				<button type="submit" class="btn btn-primary form-control">Update Role</button>
+			</div>
+			<div class="col-6 col-md-3">
+				<a  asp-action="Index" class="btn btn-outline-secondary form-control">
+					Back to list
+				</a>
+			</div>
+		</div>
+
+
+	</div>
+</form>
+
+@section Scripts {
+	@{
+		<partial name="_ValidationScriptsPartial" />
+	}
+	<script>
+		$(document).ready(function(){
+			$('#Input_Role').change(function(){
+				var selection = $('#ApplicationUser_Role Option:Selected').text();
+				if(selection=='Company'){
+					$('#ApplicationUser_CompanyId').show();
+				}else{
+					$('#ApplicationUser_CompanyId').hide();
+				}
+			})
+		})
+	</script>
+}
+
+

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Bulky.Utility;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore.Internal;
+using Bulky.DataAccess.DbInitializer;
 
 
 
@@ -43,7 +44,7 @@ builder.Services.AddSession(options =>
 
 
 
-
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddRazorPages();   
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
@@ -69,6 +70,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
+SeedDataBase();
 app.MapRazorPages();
 
 app.MapControllerRoute(
@@ -79,4 +81,11 @@ app.MapControllers();
 
 app.Run();
 
-
+void SeedDataBase()
+{
+    using (var scope = app.Services.CreateScope())
+    {
+     var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+        dbInitializer.Initialize();
+    }
+}
