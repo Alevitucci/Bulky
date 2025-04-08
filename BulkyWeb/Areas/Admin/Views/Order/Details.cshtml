@@ -258,15 +258,15 @@
                             }
                             @if (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee))
                             {
-                                @if (Model.OrderHeader.OrderStatus == SD.StatusApproved)
+                                if (Model.OrderHeader.OrderStatus == SD.StatusApproved)
                                 {
                                     <button type="submit" asp-action="StartProccessing" class="btn btn-primary form-control my-1"> Start Processing</button>
                                 }
-								@if (Model.OrderHeader.OrderStatus == SD.StatusInProcess)
+								if (Model.OrderHeader.OrderStatus == SD.StatusInProcess)
 								{
 									<button type="submit" asp-action="ShipOrder" onclick="return validateInput()" class="btn btn-success form-control my-1"> Ship Order</button>
 								}
-                                @if(Model.OrderHeader.OrderStatus!=SD.StatusRefunded &&
+                                if(Model.OrderHeader.OrderStatus!=SD.StatusRefunded &&
 													Model.OrderHeader.OrderStatus != SD.StatusCancelled &&
 													Model.OrderHeader.OrderStatus != SD.StatusShipped)
 								{
