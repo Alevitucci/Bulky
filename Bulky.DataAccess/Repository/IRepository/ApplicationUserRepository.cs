@@ -19,32 +19,6 @@ namespace Bulky.DataAccess.Repository.IRepository
         {
             _db = db;
         }
-
-        public void Add(ApplicationUser entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ApplicationUser Get(Expression<Func<ApplicationUser, bool>> filter, string? includeProperties = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Remove(ApplicationUser entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveRange(IEnumerable<ApplicationUser> entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(ApplicationUser obj)
-        {
-            throw new NotImplementedException();
-        }
-
         
     }
 }

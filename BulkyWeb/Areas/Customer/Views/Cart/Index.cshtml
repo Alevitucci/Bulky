@@ -1,4 +1,5 @@
 ﻿@model ShoppingCartVM
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"> @* Da sistemare  *@
 <form method="post">
 
@@ -29,7 +30,14 @@
 
                         <div class="row border-bottom pb-3">
                             <div class="d-none d-lg-block col-lg-1 text-center py-2">
-                                <img src="@item.Product.ImageUrl" class="rounded" width="100" />
+                                @if (item.Product.ProductImages != null && item.Product.ProductImages.Count() > 0)
+                                {
+                                    <img src="@item.Product.ProductImages.FirstOrDefault().ImageUrl" class="card-img-top rounded" />
+                                }
+                                else
+                                {
+                                    <img src="https://placehold.co/500x600/png" class="card-img-top rounded w-100" />
+                                }
                             </div>
                             <div class="col-12 col-lg-6 pt-md-3">
                                 <h5 class="text-uppercase text-secondary" style="transform:translateX(5%)"><strong>@item.Product.Title</strong></h5> @* Solo per test style="transform:translateX(10%)" *@
@@ -72,7 +80,7 @@
                         <ul class="list-group mb-4">
                             <li class="d-flex justify-content-between align-items-center">
                                 <h5 class="text-dark fw-semibold text-uppercase"> Total (USD)</h5>
-                                <h4 class="text-dark fw-bolder">@Model.OrderTotal.ToString("c")</h4>
+                                <h4 class="text-dark fw-bolder">@Model.OrderHeader.OrderTotal.ToString("c")</h4>
                             </li>
                         </ul>
                     </div>
